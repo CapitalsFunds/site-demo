@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация / Вход — Калькулятор EAT</title>
+  <style>
+    body { background: #0f172a; color: #e2e8f0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
+    .signup-box {
+      background: #171e2c;
+      padding: 2em 2.2em;
+      border-radius: 12px;
+      box-shadow: 0 8px 38px #161b2c77;
+      min-width: 320px; max-width: 95vw;
+      margin-top: 20px;
+    }
+    h2 { margin-top:0; font-size:1.29em; font-weight:700; text-align:center; }
+    label { display:block; margin-bottom:.2em; font-size:1em; color:#fbbf24; font-weight:500; }
+    input[type=email], input[type=password], input[type=text] {
+      width:100%; box-sizing:border-box; padding:.82em; margin-bottom:1.34em; border-radius:7px; border:1px solid #aecbfc;
+      outline:none; color:#e2e8f0; background:#111927; font-size:1em;
+    }
+    input:focus { border-color:#f59e0b; background:#171e2c; }
+    .btn-main {
+      width:100%; background:linear-gradient(90deg,#fbbf24,#fde68a 80%);
+      color:#732d13; padding:.7em 0; font-weight:700; font-size:1.14em; border:none; border-radius:8px; cursor:pointer;
+      margin-bottom: 1.1em; box-shadow:0 2px 12px #f3d1853a; transition:.16s; }
+    .btn-main:hover {background:linear-gradient(90deg,#fde68a,#fbbf24 70%); color:#a16207; }
+    .chg { text-align:right; font-size:.96em; margin-top:-1.08em; margin-bottom:.3em; }
+    a { color:#f59e0b;text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .note { text-align:center; font-size:.96em; color:#fff9; margin-top:1.2em; }
+  </style>
+</head>
+<body>
+  <form class="signup-box">
+    <h2>Регистрация / Вход</h2>
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required autocomplete="email" placeholder="Ваш email" />
+    <label for="name">Имя</label>
+    <input type="text" id="name" name="name" required autocomplete="username" placeholder="Ваше имя" />
+    <label for="password">Пароль</label>
+    <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••" />
+    <button type="submit" class="btn-main">Создать аккаунт / Войти</button>
+    <div class="chg"><a href="#">Забыли пароль?</a></div>
+    <div class="note">После регистрации с вами свяжется эксперт для расчёта под вашу задачу. <br>Все услуги — бесплатно.</div>
+  </form>
+</body>
+</html>

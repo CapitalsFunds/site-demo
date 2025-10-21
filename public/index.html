@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Калькулятор чистого дохода (EAT): выбери оптимальную структуру бизнеса и капитала</title>
+  <style>
+    :root {
+      --bg: #0f172a; --panel: #111827; --muted: #94a3b8; --text: #e2e8f0;
+      --accent: #f59e0b; --ok: #10b981; --warn: #f59e0b; --bad: #ef4444;
+      --card: #171e2c; --border: #1e293b;
+    }
+    html, body { min-height: 100vh; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial;
+      background: radial-gradient(1000px 600px at 0% 0%, rgba(245,158,11,.14), transparent),
+                  radial-gradient(800px 500px at 100% 100%, rgba(16,185,129,.09), transparent),
+                  var(--bg);
+      color: var(--text);
+    }
+    h1 { font-size: 1.45em; font-weight:700; margin-bottom: 0.9em;}
+    form, table {
+      background: var(--card);
+      border-radius: 15px;
+      box-shadow: 0 4px 24px #000c;
+      padding: 2em 1.8em 1.7em 1.8em;
+      margin-bottom: 2.3em;
+      border:1.6px solid var(--border);
+      transition: box-shadow 0.3s;
+    }
+    label { display: block; margin-bottom: 0.38em; color:var(--muted); font-weight:600 }
+    input, select {
+      margin-bottom: 0.6em; width: 100%; font-size:1.05em;
+      padding: 0.7em 0.85em; box-sizing: border-box; border-radius:10px;
+      border:1px solid var(--border); background:#101827; color:var(--text);
+      outline:none; transition: border-color .23s, box-shadow .13s;
+    }
+    input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 2px #f59e0b33; }
+    .form-row { margin-bottom:0.74em; }
+    .small{ color:var(--muted); font-size:.95em; }
+    button {
+      background: linear-gradient(90deg,#f59e0b,#fbbf24 70%); color:#222; border:none; border-radius:8px;
+      padding:0.68em 2.2ем; font-size:1.12em; font-weight:700; letter-spacing:0.01em;
+      box-shadow:0 2px 8px #fbbf243b; cursor:pointer; margin-top:0.6em; transition:.13s;
+    }
+    button:hover { background:linear-gradient(90deg,#fbbf24,#f59e0b 80%); box-shadow:0 8px 18px #f59e0b43; transform:translateY(-2px) scale(1.034); }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .label-with-help { display:flex; align-items:center; gap:.4rem; }
+    .help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.23em;
+      height: 1.23em;
+      font-size: 1em;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      margin-left: 0.32em;
+      vertical-align: middle;
+      transition: border-color .22s, color .22s, background .18s;
+      cursor: help;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .help:hover, .help:focus {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #232e4244;
+    }
+
+    .hint { font-size: 1em; color:var(--muted); margin-bottom:1.6em; background:#232e42; border-radius: 9px; padding:.75em 1.2em; line-height:1.7; }
+    .warning { color:#f59e0b; background:#312407; border-radius:10px; font-size:1em; margin:1em 0 1.3em; padding:.8em 1.15em; border-left:5px solid var(--warn); }
+    #notes.notes { background:#064e3b; border-left:4px solid #10b981; margin-top:1em; color:#e0fce4; font-size:1em; padding:.85em 1.2em; border-radius:8px; }
+
+    table { border-collapse:separate; border-spacing:0; width:100%; margin-top:1.1em; background:var(--panel); border-radius:14px; overflow:hidden;
+      box-shadow:0 2px 16px #10b98122; animation:fadein-table .7s cubic-bezier(.18,.89,.32,1.28);}
+    th, td { border:none; padding:.62em .82em; text-align:center; transition:background .22s; }
+    th { background:linear-gradient(89deg,#232e42,#272a2e 90%); font-weight:700; color:var(--accent); letter-spacing:0.01em; font-size:1.08em; border-bottom:2px solid var(--border); }
+    td { background:var(--card); font-size:1.05em; }
+    tr:hover td { background:#232e42; }
+    tr td:first-child { font-weight:600; color:#fbbf24; }
+
+    @media (max-width:700px){
+      body { padding:0.4em; }
+      form, table { padding:0.7em; }
+      th, td { padding:0.34em 0.15em; font-size:0.97em; }
+    }
+    @keyframes fadein-table { 0% { opacity:0; transform: translateY(22px) scale(.97);} 100%{opacity:1; transform:none;} }
+    .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:1rem; }
+    .span5 { grid-column: span 5; } .span7 { grid-column: span 7; } .span12 { grid-column:1 / -1; }
+    .card { background:var(--card); border:1.6px solid var(--border); border-radius:15px; box-shadow:0 4px 24px #000c; padding:2em 1.8em 1.7em; }
+    @media (max-width:900px){ .span5, .span7 { grid-column:1 / -1; } }
+    .wrap{ max-width:1180px; margin:0 auto; padding:28px 16px 60px; }
+    header{ margin-bottom:14px; }
+    .result-block, .results, .calculator-results, #result, .results-table, table {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji" !important;
+    }
+    .my-results-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #191f2b;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px #151c2733;
+      margin-bottom: 25px;
+    }
+    .my-results-table th, .my-results-table td {
+      padding: 0.8em 1.2em;
+      font-size: 1.07em;
+    }
+    .my-results-table th {
+      background: linear-gradient(89deg,#232a3a,#232a3f 90%);
+      color: #fbbf24;
+      font-weight: 700;
+      text-align: left;
+      letter-spacing: 0.02em;
+      border-bottom: 2px solid #2d3140;
+    }
+    .my-results-table td {
+      background: #191f2b;
+      color: #e5e7eb;
+      font-variant-numeric: tabular-nums lining-nums;
+      border-bottom: 1px solid #252941;
+      text-align: left;
+    }
+    .my-results-table tr:last-child td {
+      border-bottom: none;
+    }
+    .my-results-table td:first-child {
+      color: #fbbf24;
+      font-weight: 600;
+      min-width: 220px;
+    }
+    .my-results-table td.num {
+      text-align: right;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 1.08em;
+    }
+    @media (max-width: 700px) {
+      .my-results-table th, .my-results-table td {padding: 0.5em 0.15em; font-size:1em;}
+      .my-results-table td:first-child {min-width:100px;}
+    }
+    .my-results-table th,
+    .my-results-table td {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", Courier, monospace;
+    }
+    .label-with-help.vertical-help {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .label-with-help.vertical-help .help {
+      margin-left: 0;
+      margin-bottom: 2px;
+    }
+    .label-with-help.vertical-help span {
+      display: block;
+      text-align: center;
+    }
+    .receipt-table, .receipt-table table, .receipt-table th, .receipt-table td {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", Courier, monospace;
+    }
+    .receipt-table td:first-child,
+    .my-results-table td:first-child {
+      white-space: nowrap;
+      text-align: right;
+    }
+    .best-effect {
+      background: linear-gradient(90deg, #fffbe6 60%, #fde68a 100%);
+      color: #92400e;
+      font-weight: bold;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 0 0 3px #f59e0b55;
+    }
+    body.dark .best-effect {
+      background: linear-gradient(90deg, #23220e 40%, #a16207 90%);
+      color: #fef3c7;
+      box-shadow:0 0 2px #f59e0bee;
+    }
+    .calc-lead-block {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 98px;
+      background: var(--card);
+      margin-top: 12px;
+      padding: 1.2em 1.6em 1.4em 1.6em;
+      box-shadow: 0 2px 13px #222c3a2d;
+    }
+    .order-lead-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .order-lead-desc {
+      color: var(--muted);
+      text-align: center;
+      font-size: 1.08em;
+      margin-bottom: 1.13em;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .btn-main {
+      background: linear-gradient(90deg, #fbbf24, #fde68a 80%);
+      color: #732d13;
+      padding: 0.86em 2.8em;
+      font-weight: 700;
+      font-size: 1.15em;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      box-shadow: 0 2px 14px #fbd48a33;
+      transition: .18s;
+      text-shadow: 0 1px 0 #fff7;
+      text-align: center;
+      min-width: 170px;
+      margin: .48em 0;
+      display: inline-block;
+    }
+    .btn-main:hover, .btn-main:focus {
+      background: linear-gradient(90deg,#fcd34d,#fbbf24 68%);
+      color: #b45309;
+    }
+    .table-scroll { width: 100%; overflow-x: auto; }
+    @media (max-width: 700px) {
+      .table-scroll { padding-bottom: 2px; margin-bottom: 1px; }
+      .receipt-table table, .my-results-table { min-width: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Калькулятор чистого дохода (EAT): выбери оптимальную структуру бизнеса и капитала</h1>
+    </header>
+
+    <div class="grid">
+      <section class="card span5">
+        <form id="calc-form" autocomplete="off">
+          <div class="form-row">
+            <label for="baseline" class="label-with-help">
+              <span>Базовая структура (как сейчас)
+                <sup style="vertical-align: super; font-size: 0.75em; line-height: 0;">
+                  <button type="button" class="help" aria-label="Пояснение"
+                    title="Выберите структуру, в которой работаете сейчас. Это точка отсчёта для сравнения чистого дохода и расчёта эффектов. Если сомневаетесь — укажите ту, через которую поступает основной доход">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"
+                      style="display:inline-block;vertical-align:baseline;">
+                      <circle cx="8" cy="8" r="6.1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                      <text x="8" y="11" text-anchor="middle" font-size="8" font-family="ui-sans-serif,Arial" fill="currentColor">?</text>
+                    </svg>
+                  </button>
+                </sup>
+              </span>
+            </label>
+            <select id="baseline" name="baseline">
+              <option value="ИП" selected>ИП</option>
+              <option value="ООО / Холдинг">ООО / Холдинг</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="ebt">EBT — Доход до налогообложения (млн ₽)</label>
+            <input type="number" id="ebt" name="ebt" step="0.1" min="0" value="100" inputmode="decimal" required />
+          </div>
+
+          <div class="form-row">
+            <label for="sharePersonal">Процент дохода на личные нужды (%) от EBT</label>
+            <input type="number" id="sharePersonal" name="sharePersonal" step="1" min="0" max="100" value="60" inputmode="decimal" required />
+          </div>
+
+          <div class="form-row">
+            <label for="keyRate" class="label-with-help">
+              <span>Ключевая ставка Банка России (%)
+                <sup style="vertical-align: super; font-size: 0.75em; line-height: 0;">
+                  <button type="button" class="help" aria-label="Пояснение"
+                    title="Ключевая ставка публикуется ЦБ РФ и подставляется автоматически. Если вы планируете считать по собственной целевой рентабельности, введите её вместо ключевой.">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"
+                      style="display:inline-block;vertical-align:baseline;">
+                      <circle cx="8" cy="8" r="6.1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                      <text x="8" y="11" text-anchor="middle" font-size="8" font-family="ui-sans-serif,Arial" fill="currentColor">?</text>
+                    </svg>
+                  </button>
+                </sup>
+              </span>
+            </label>
+            <input type="number" id="keyRate" name="keyRate" step="0.1" min="0" max="100" value="10" inputmode="decimal" required />
+            <!-- Дата из ЦБ — обновляется автоматически -->
+            <div id="keyRateDate" class="small" aria-live="polite"></div>
+          </div>
+
+          <!-- Срок и Комиссии скрыты, но доступны скрипту -->
+          <div class="form-row" hidden>
+            <label for="inpt">Срок (лет)</label>
+            <input type="number" id="inpt" name="inpt" step="1" min="1" value="1" inputmode="decimal" />
+          </div>
+          <div class="form-row" hidden>
+            <label for="inpFees">Комиссии и расходы (млн ₽)</label>
+            <input type="number" id="inpFees" name="inpFees" step="0.1" min="0" value="0" inputmode="decimal" />
+          </div>
+
+          <!-- Кнопка исчезает: все расчёты теперь живые -->
+        </form>
+      </section>
+
+      <section class="card span7">
+        <h3 style="margin-top:0">Таблица сравнения</h3>
+        <div class="table-scroll"><div id="result" role="region" aria-live="polite" aria-atomic="true"></div></div>
+      </section>
+
+      <section class="card span12 calc-lead-block">
+        <div class="order-lead-inner">
+          <div class="order-lead-desc">
+            <b>Ваш расчёт готов. Если хотите  счв дробнее разобраться, как формируется каждая цифра — скачайте и откройте файл с расчётом: там есть формулы, комментарии и пояснения.
+              Всё прозрачно и понятно.</b>
+            
+          </div>
+          <button id="order-detailed" class="btn-main">Заказать детальный расчёт бесплатно</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Подключаем ваш расчётный скрипт первым -->
+  <script src="script.js"></script>
+
+  <!-- Автоподстановка ставки: без submit, без перезагрузки -->
+  <script>
+    window.addEventListener('load', async function () {
+      const keyRateInput = document.getElementById('keyRate');
+      const keyRateDateEl = document.getElementById('keyRateDate');
+      // защита от повторного автозаполнения (если load сработает повторно)
+      if (keyRateInput?.dataset.autofilled === '1') return;
+      try {
+        const resp = await fetch('/.netlify/functions/keyrate', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const { rate, date } = await resp.json();
+        if (typeof rate === 'number' && !Number.isNaN(rate)) {
+          keyRateInput.value = rate.toFixed(2);
+          // безопасно дёргаем только input/change — без submit
+          ['input','change'].forEach(type => {
+            keyRateInput.dispatchEvent(new Event(type, { bubbles: true }));
+          });
+          // если у вас есть явная функция пересчёта — вызовем её
+          if (typeof window.calculate === 'function') {
+            try { window.calculate(); } catch(_) {}
+          }
+          keyRateInput.dataset.autofilled = '1';
+        }
+        if (keyRateDateEl && date) {
+          keyRateDateEl.textContent = 'Дата Банка России: ' + date;
+        }
+      } catch (e) {
+        console.warn('Не удалось загрузить ключевую ставку:', e);
+        if (keyRateDateEl) keyRateDateEl.textContent = 'Не удалось получить дату Банка России';
+      }
+    });
+  </script>
+  <script>
+document.addEventListener('DOMContentLoaded',function(){
+  const btn = document.getElementById('order-detailed');
+  if (btn) {
+    btn.onclick = function() {
+      window.location.href = '/signup.html';
+    };
+  }
+});
+</script>
+</body>
+</html>
